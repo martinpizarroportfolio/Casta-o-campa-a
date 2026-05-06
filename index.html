@@ -90,14 +90,16 @@
     .viewer-wrap {
       position: relative;
       width: 100%;
-      height: 60vh;
-      min-height: 320px;
-      touch-action: none;
+      height: 62vh;
+      min-height: 340px;
+      background: #060606;
     }
-    #three-canvas {
-      width: 100% !important;
-      height: 100% !important;
-      display: block;
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      --progress-bar-color: var(--red);
+      --progress-bar-height: 2px;
+      background-color: #060606;
     }
     .viewer-hint {
       position: absolute;
@@ -113,33 +115,6 @@
       transition: opacity 1.2s ease;
     }
     .viewer-hint.hidden { opacity: 0; }
-    .viewer-loader {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      background: #060606;
-      transition: opacity 0.6s ease;
-      pointer-events: none;
-    }
-    .viewer-loader.hidden { opacity: 0; }
-    .loader-spinner {
-      width: 36px; height: 36px;
-      border: 2px solid #1e1e1e;
-      border-top-color: var(--red);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loader-text {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      color: #333;
-    }
 
     /* ── TAGLINE ─────────────────────────────────── */
     .tagline {
@@ -342,11 +317,23 @@
 
 <!-- 3D VIEWER -->
 <div class="viewer-wrap">
-  <canvas id="three-canvas"></canvas>
-  <div class="viewer-loader" id="loader">
-    <div class="loader-spinner"></div>
-    <div class="loader-text">CARGANDO MODELO</div>
-  </div>
+  <model-viewer
+    src="crux-dosificador.glb"
+    alt="El Crux Dosificador — Rediseño Packaging"
+    auto-rotate
+    auto-rotate-delay="1000"
+    rotation-per-second="30deg"
+    camera-controls
+    touch-action="pan-y"
+    shadow-intensity="1.2"
+    shadow-softness="0.8"
+    exposure="0.9"
+    environment-image="neutral"
+    camera-orbit="0deg 80deg 4m"
+    min-camera-orbit="auto auto 2m"
+    max-camera-orbit="auto auto 8m"
+    interaction-prompt="none"
+  ></model-viewer>
   <div class="viewer-hint" id="hint">ARRASTRA PARA ROTAR &nbsp;·&nbsp; PELLIZCA PARA ZOOM</div>
 </div>
 
@@ -443,237 +430,10 @@
   <div class="footer-site"><a href="https://www.elcruxtienda.cl">www.elcruxtienda.cl</a></div>
 </footer>
 
-<!-- THREE.JS + GLTF + DRACO -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+<!-- MODEL VIEWER (Google) — maneja GLB + Draco automáticamente -->
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 <script>
-// ── SETUP ──────────────────────────────────────────────────────────────
-const canvas = document.getElementById('three-canvas');
-const wrap   = canvas.parentElement;
-const W = () => wrap.clientWidth;
-const H = () => wrap.clientHeight;
-
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(W(), H());
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.4;
-
-const scene  = new THREE.Scene();
-scene.background = new THREE.Color(0x060606);
-scene.fog = new THREE.FogExp2(0x060606, 0.08);
-
-const camera = new THREE.PerspectiveCamera(40, W() / H(), 0.1, 100);
-camera.position.set(0, 0.3, 4.8);
-
-// ── LIGHTING ───────────────────────────────────────────────────────────
-scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-
-const main = new THREE.DirectionalLight(0xffffff, 2.2);
-main.position.set(-3, 6, 4);
-main.castShadow = true;
-main.shadow.mapSize.set(1024, 1024);
-scene.add(main);
-
-const fill = new THREE.DirectionalLight(0xffe8d0, 0.5);
-fill.position.set(5, 1, 3);
-scene.add(fill);
-
-const rim = new THREE.DirectionalLight(0xaabbff, 0.3);
-rim.position.set(0, -3, -5);
-scene.add(rim);
-
-const redGlow = new THREE.PointLight(0xcc0000, 1.2, 8);
-redGlow.position.set(-2.5, 0.5, 2);
-scene.add(redGlow);
-
-const topGlow = new THREE.PointLight(0xffffff, 0.5, 6);
-topGlow.position.set(0, 5, 3);
-scene.add(topGlow);
-
-// ── GROUND PLANE ───────────────────────────────────────────────────────
-const planeGeo = new THREE.PlaneGeometry(14, 14);
-const planeMat = new THREE.MeshStandardMaterial({ color: 0x060606, roughness: 0.95 });
-const plane = new THREE.Mesh(planeGeo, planeMat);
-plane.rotation.x = -Math.PI / 2;
-plane.receiveShadow = true;
-scene.add(plane);
-
-// ── LOAD GLB MODEL ─────────────────────────────────────────────────────
-const group = new THREE.Group();
-scene.add(group);
-
-const dracoLoader = new THREE.DRACOLoader();
-dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
-dracoLoader.preload();
-
-const loader = new THREE.GLTFLoader();
-loader.setDRACOLoader(dracoLoader);
-
-const loaderEl = document.getElementById('loader');
-
-loader.load(
-  'crux-dosificador.glb',
-  (gltf) => {
-    const model = gltf.scene;
-
-    // Auto-fit: center and normalize scale to fill the view
-    const box = new THREE.Box3().setFromObject(model);
-    const center = box.getCenter(new THREE.Vector3());
-    const size   = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const targetSize = 2.8;
-    const scale = targetSize / maxDim;
-
-    model.scale.setScalar(scale);
-    model.position.sub(center.multiplyScalar(scale));
-
-    // Enable shadows on all meshes
-    model.traverse(node => {
-      if (node.isMesh) {
-        node.castShadow = true;
-        node.receiveShadow = true;
-      }
-    });
-
-    group.add(model);
-
-    // Position ground below model
-    const newBox = new THREE.Box3().setFromObject(group);
-    plane.position.y = newBox.min.y - 0.02;
-
-    group.rotation.y = -0.3;
-
-    // Hide loader
-    loaderEl.classList.add('hidden');
-    setTimeout(() => { loaderEl.style.display = 'none'; }, 700);
-  },
-  (xhr) => {
-    // Progress — optional
-  },
-  (err) => {
-    console.error('Error cargando modelo:', err);
-    loaderEl.querySelector('.loader-text').textContent = 'ERROR AL CARGAR';
-  }
-);
-
-// ── TOUCH / MOUSE CONTROLS ─────────────────────────────────────────────
-let isDragging = false;
-let lastX = 0, lastY = 0;
-let velX  = 0, velY  = 0;
-let curScale = 1;
-let lastPinch = null;
-let autoRotate = true;
-let autoTimer;
-
-function pauseAuto() {
-  autoRotate = false;
-  clearTimeout(autoTimer);
-  autoTimer = setTimeout(() => { autoRotate = true; }, 3500);
-}
-
-// Mouse
-canvas.addEventListener('mousedown', e => {
-  isDragging = true; velX = velY = 0;
-  lastX = e.clientX; lastY = e.clientY;
-  pauseAuto();
-});
-window.addEventListener('mousemove', e => {
-  if (!isDragging) return;
-  velX = (e.clientX - lastX) * 0.009;
-  velY = (e.clientY - lastY) * 0.006;
-  group.rotation.y += velX;
-  group.rotation.x  = Math.max(-0.65, Math.min(0.65, group.rotation.x + velY));
-  lastX = e.clientX; lastY = e.clientY;
-});
-window.addEventListener('mouseup', () => { isDragging = false; });
-
-canvas.addEventListener('wheel', e => {
-  e.preventDefault();
-  curScale = Math.max(0.4, Math.min(2.6, curScale - e.deltaY * 0.0009));
-  group.scale.setScalar(curScale);
-  pauseAuto();
-}, { passive: false });
-
-// Touch
-canvas.addEventListener('touchstart', e => {
-  e.preventDefault();
-  if (e.touches.length === 1) {
-    isDragging = true; velX = velY = 0;
-    lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
-    pauseAuto();
-  } else if (e.touches.length === 2) {
-    isDragging = false;
-    lastPinch = pinchDist(e);
-  }
-}, { passive: false });
-
-canvas.addEventListener('touchmove', e => {
-  e.preventDefault();
-  if (e.touches.length === 1 && isDragging) {
-    velX = (e.touches[0].clientX - lastX) * 0.011;
-    velY = (e.touches[0].clientY - lastY) * 0.007;
-    group.rotation.y += velX;
-    group.rotation.x  = Math.max(-0.65, Math.min(0.65, group.rotation.x + velY));
-    lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
-  } else if (e.touches.length === 2 && lastPinch !== null) {
-    const d = pinchDist(e);
-    curScale = Math.max(0.4, Math.min(2.6, curScale * (d / lastPinch)));
-    group.scale.setScalar(curScale);
-    lastPinch = d;
-    pauseAuto();
-  }
-}, { passive: false });
-
-canvas.addEventListener('touchend', e => {
-  if (e.touches.length < 2) lastPinch = null;
-  if (e.touches.length === 0) isDragging = false;
-});
-
-function pinchDist(e) {
-  const dx = e.touches[0].clientX - e.touches[1].clientX;
-  const dy = e.touches[0].clientY - e.touches[1].clientY;
-  return Math.hypot(dx, dy);
-}
-
-// ── HINT FADE ───────────────────────────────────────────────────────────
 setTimeout(() => document.getElementById('hint').classList.add('hidden'), 4500);
-
-// ── RESIZE ─────────────────────────────────────────────────────────────
-window.addEventListener('resize', () => {
-  camera.aspect = W() / H();
-  camera.updateProjectionMatrix();
-  renderer.setSize(W(), H());
-});
-
-// ── ANIMATION LOOP ──────────────────────────────────────────────────────
-const clock = new THREE.Clock();
-function animate() {
-  requestAnimationFrame(animate);
-  const elapsed = clock.getElapsedTime();
-
-  if (autoRotate) {
-    group.rotation.y += 0.0045;
-    velX = 0; velY = 0;
-  } else if (!isDragging) {
-    velX *= 0.90;
-    velY *= 0.90;
-    group.rotation.y += velX;
-    group.rotation.x = Math.max(-0.65, Math.min(0.65, group.rotation.x + velY));
-  }
-
-  // Subtle float
-  group.position.y = Math.sin(elapsed * 0.55) * 0.06;
-
-  // Red glow pulse
-  redGlow.intensity = 1.0 + Math.sin(elapsed * 1.4) * 0.35;
-
-  renderer.render(scene, camera);
-}
-animate();
 </script>
 
 </body>
