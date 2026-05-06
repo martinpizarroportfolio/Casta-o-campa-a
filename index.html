@@ -1,1221 +1,782 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Castaño — Empieza bien tu día.</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Dancing+Script:wght@600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>El Crux — Rediseño Magnesio 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    :root {
+      --red: #D10000;
+      --bg: #070707;
+      --card: #101010;
+      --border: #1e1e1e;
+      --muted: #555555;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
 
-:root{
-  --bg:    #1A0A02;
-  --brown: #2C1006;
-  --gold:  #C8922A;
-  --yell:  #F5C518;
-  --cream: #F5EDD8;
-  --white: #FFFFFF;
-  --brief-bg:   #FAF7F2;
-  --text-dark:  #1C0A04;
-  --text-mid:   #5C3020;
-  --text-soft:  #9A6B5A;
-}
+    /* ── HEADER ─────────────────────────────────── */
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: rgba(7,7,7,0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 3px;
+      color: #fff;
+    }
+    .header-logo span { color: var(--red); }
+    .header-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--red);
+      border: 1px solid var(--red);
+      padding: 3px 9px;
+      border-radius: 3px;
+    }
 
-html{ scroll-behavior:smooth; }
-body{ background:var(--bg); font-family:'DM Sans',sans-serif; overflow-x:hidden; }
+    /* ── HERO ───────────────────────────────────── */
+    .hero {
+      padding-top: 56px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      color: var(--red);
+      text-transform: uppercase;
+      padding: 22px 20px 0;
+    }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(56px, 18vw, 88px);
+      line-height: 0.88;
+      color: #fff;
+      padding: 10px 16px 2px;
+    }
+    .hero-sub {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      padding: 8px 20px 0;
+    }
 
-/* ═══════════════════════════════════════
-   SHOWCASE — sticky top section
-═══════════════════════════════════════ */
-#showcase{
-  height:100vh;
-  position:sticky;
-  top:0;
-  overflow:hidden;
-  background:var(--bg);
-  z-index:10;
-}
+    /* ── 3D VIEWER ──────────────────────────────── */
+    .viewer-wrap {
+      position: relative;
+      width: 100%;
+      height: 60vh;
+      min-height: 320px;
+      touch-action: none;
+    }
+    #three-canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+    .viewer-hint {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2.5px;
+      color: rgba(255,255,255,0.3);
+      white-space: nowrap;
+      pointer-events: none;
+      transition: opacity 1.2s ease;
+    }
+    .viewer-hint.hidden { opacity: 0; }
 
-/* all absolute inside showcase */
-video.bg,img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;}
+    /* ── TAGLINE ─────────────────────────────────── */
+    .tagline {
+      text-align: center;
+      padding: 32px 24px 28px;
+      border-top: 1px solid var(--border);
+      background: linear-gradient(to bottom, #0d0d0d, var(--bg));
+    }
+    .tagline-main {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(42px, 14vw, 72px);
+      line-height: 0.9;
+      color: var(--red);
+    }
+    .tagline-sub {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 3px;
+      color: var(--muted);
+      margin-top: 12px;
+      text-transform: uppercase;
+    }
 
-.overlay-dark{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0) 0%,rgba(0,0,0,.12) 40%,rgba(0,0,0,.68) 72%,rgba(0,0,0,.9) 100%);}
-.overlay-mid{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.52) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0) 50%,rgba(0,0,0,.72) 80%,rgba(0,0,0,.93) 100%);}
+    /* ── SECTIONS ────────────────────────────────── */
+    .section {
+      padding: 36px 20px 24px;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 30px;
+      letter-spacing: 1px;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+    .section-body {
+      font-size: 13px;
+      line-height: 1.75;
+      color: #777;
+    }
 
-/* Scroll hint y brief deben ir POR ENCIMA del showcase sticky */
-.scroll-hint{ position:relative; z-index:20; }
-.brief{ position:relative; z-index:20; }
+    /* ── PROBLEM CARDS ───────────────────────────── */
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0 20px 36px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 20px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--red);
+    }
+    .card-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 44px;
+      color: var(--red);
+      opacity: 0.2;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .card-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: #e0e0e0;
+      margin-bottom: 8px;
+    }
+    .card-body {
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: #606060;
+    }
 
-/* ═══════════════════════════════════════
-   SCROLL HINT — transición al brief blanco
-═══════════════════════════════════════ */
-.scroll-hint{
-  background:linear-gradient(to bottom, var(--bg) 0%, #FAF7F2 100%);
-  padding:32px;
-}
-.scroll-hint a{ color:#9A6B5A; }
-.scroll-hint a:hover{ color:#C8922A; }
-.scroll-arrow{ color:#C8922A; }
+    /* ── RENDER IMAGE ────────────────────────────── */
+    .render-section { padding: 0 20px 36px; }
+    .render-img {
+      width: 100%;
+      border-radius: 14px;
+      object-fit: cover;
+      display: block;
+    }
 
-/* ═══════════════════════════════════════
-   BRIEF — tema claro, contrastes correctos
-═══════════════════════════════════════ */
+    /* ── POSITIONING ─────────────────────────────── */
+    .positioning { padding: 0 20px 36px; }
+    .pos-row { display: flex; gap: 10px; margin-top: 4px; }
+    .pos-card {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 16px;
+    }
+    .pos-card.new { border-color: var(--red); }
+    .pos-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .pos-card.new .pos-label { color: var(--red); }
+    .pos-item {
+      font-size: 12px;
+      color: #666;
+      padding: 6px 0;
+      border-bottom: 1px solid #191919;
+      line-height: 1.3;
+    }
+    .pos-item:last-child { border-bottom: none; }
+    .pos-card.new .pos-item { color: #c0c0c0; }
 
-/* Encabezado hero */
-.brief .brief-eyebrow{ color:#C8922A; }
-.brief .brief-title{ color:#1C0A04; }
-.brief .brief-title em{ color:#C8922A; display:block; }
-.brief .brief-subtitle{ color:#5C3020; font-style:normal; }
-.brief .brief-lead{ color:#5C3020; }
+    /* ── GALLERY ─────────────────────────────────── */
+    .gallery-scroll {
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding-left: 20px;
+      margin-bottom: 36px;
+    }
+    .gallery-scroll::-webkit-scrollbar { display: none; }
+    .gallery-row { display: flex; gap: 10px; padding-right: 20px; }
+    .gallery-row img {
+      height: 230px;
+      width: auto;
+      border-radius: 12px;
+      object-fit: cover;
+      flex-shrink: 0;
+      display: block;
+    }
 
-/* Stats */
-.brief .stats-strip{ background:#F0E8DC; border-color:#DEB87A; gap:2px; }
-.brief .stat{ background:#FAF7F2; }
-.brief .stat-num{ color:#C8922A; }
-.brief .stat-label{ color:#5C3020; }
-
-/* Divisores */
-.brief .divider{ background:#E8D8C4; }
-
-/* Tags y títulos de sección */
-.brief .section-tag{ background:#C8922A; color:#fff; }
-.brief .section-title{ color:#1C0A04; }
-.brief .section-title em{ color:#C8922A; display:block; }
-.brief .section-body{ color:#5C3020; }
-
-/* Concepto */
-.brief .concepto-quote{ color:#C8922A; }
-.brief .concepto-text{ color:#5C3020; }
-.brief .concepto-card{ background:#F0E8DC; border-color:#DEB87A; }
-.brief .concepto-card-title{ color:#1C0A04; }
-.brief .concepto-card-body{ color:#5C3020; }
-
-/* Desafío */
-.brief .challenge-box{ background:#F0E8DC; border-color:#C8922A; border-left:4px solid #C8922A; }
-.brief .challenge-label{ color:#C8922A; }
-.brief .challenge-text{ color:#1C0A04; }
-.brief .challenge-sub{ color:#5C3020; }
-.brief .solution-title{ color:#1C0A04; }
-.brief .solution-body{ color:#5C3020; }
-
-/* Arquetipo */
-.brief .arq-badge{ background:#F0E8DC; border-color:#C8922A; }
-.brief .arq-name{ color:#C8922A; }
-.brief .arq-text{ color:#5C3020; }
-.brief .arq-nota{ color:#C8922A; }
-
-/* Pilares */
-.brief .pillar{ background:#fff; border-color:#E0C9A6; box-shadow:0 2px 12px rgba(200,146,42,.08); }
-.brief .pillar:hover{ background:#F5EDD8; border-color:#C8922A; }
-.brief .pillar-title{ color:#1C0A04; }
-.brief .pillar-body{ color:#5C3020; }
-
-/* Formatos */
-.brief .format-card{ background:#fff; border-color:#E0C9A6; }
-.brief .format-name{ color:#1C0A04; }
-.brief .format-size{ color:#9A6B5A; }
-.brief .format-desc{ color:#5C3020; }
-
-/* Footer */
-/* Autor en hero */
-.brief-author{
-  font-size:11px;letter-spacing:.18em;text-transform:uppercase;
-  color:#9A6B5A;margin-top:10px;margin-bottom:24px;
-}
-.brief-author strong{ color:#C8922A;font-weight:600;letter-spacing:.05em; }
-
-/* Autor en footer */
-.footer-designer{ display:flex;flex-direction:column;gap:3px; }
-.footer-designer-label{ font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#9A6B5A; }
-.footer-designer-name{ font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:16px;color:#1C0A04; }
-
-.brief .footer-name{ color:#1C0A04; }
-.brief .footer-claim{ color:#C8922A; }
-.brief .footer-meta{ color:#9A6B5A; }
-.brief .footer-back a{ color:#5C3020; border-color:#DEB87A; }
-.brief .footer-back a:hover{ background:#F0E8DC; color:#1C0A04; }
-
-/* ── HUD ── */
-.hud{
-  position:absolute;top:0;left:0;right:0;
-  padding:18px 32px;
-  display:flex;justify-content:space-between;align-items:center;
-  z-index:800;pointer-events:none;
-}
-.hud-l{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(255,255,255,.18);}
-.hud-r{font-family:'Dancing Script',cursive;font-size:17px;color:rgba(245,197,24,.45);}
-
-/* ── ARROWS ── */
-.arrow{
-  position:absolute;top:50%;transform:translateY(-50%);
-  width:46px;height:46px;border-radius:50%;
-  background:rgba(255,255,255,.07);backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,.1);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;z-index:800;
-  color:rgba(255,255,255,.55);font-size:20px;line-height:1;
-  transition:background .2s,color .2s;user-select:none;
-}
-.arrow:hover{background:rgba(255,255,255,.14);color:#fff;}
-.arrow-prev{left:20px;}
-.arrow-next{right:20px;}
-
-/* ── NAV ── */
-.nav{
-  position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
-  display:flex;gap:3px;align-items:center;
-  background:rgba(44,16,6,.88);backdrop-filter:blur(20px);
-  border:1px solid rgba(200,146,42,.3);
-  padding:5px 8px;border-radius:40px;z-index:800;
-  white-space:nowrap;
-}
-.nav-item{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:6px 10px;border-radius:28px;cursor:pointer;
-  transition:background .25s, transform .15s;
-}
-.nav-item:hover{background:rgba(200,146,42,.15);}
-.nav-item.active{background:var(--gold);}
-.nav-item.active:hover{background:var(--gold);}
-.nav-icon{font-size:11px;line-height:1;color:rgba(255,255,255,.6);transition:color .25s;}
-.nav-lbl{font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);transition:color .25s;white-space:nowrap;}
-.nav-item.active .nav-lbl{color:#fff;}
-.nav-item.active .nav-icon{color:#fff;filter:none;}
-
-/* ── SCENES ── */
-.scene{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;
-}
-
-/* piece label */
-.ptag{position:absolute;top:-28px;left:0;font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.16);}
-
-/* ── LOGO SVG ── */
-.logo-mark{display:inline-block;line-height:1;}
-.logo-mark img{display:block;width:90px;height:auto;}
-.logo-mark.sm img{width:72px;}
-.logo-mark.lg img{width:150px;}
-
-.shadow-box{box-shadow:0 44px 120px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.06);}
-
-/* ── VERTICAL FRAME 9:16 ── */
-.vt{
-  --vw:min(300px,36vmin);
-  width:var(--vw);
-  height:calc(var(--vw)*16/9);
-  border-radius:16px;overflow:hidden;position:relative;
-}
-.vt-inner{
-  position:absolute;inset:0;z-index:3;
-  display:flex;flex-direction:column;justify-content:space-between;
-  padding:20px 18px;
-}
-.vt-top{display:flex;justify-content:space-between;align-items:center;}
-.vt-x{font-size:18px;color:rgba(255,255,255,.3);line-height:1;}
-.vt-bot{}
-.vt-eye{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--yell);margin-bottom:8px;}
-.hl-vt{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(22px,3vmin,36px);color:#fff;line-height:.9;letter-spacing:-.02em;}
-.hl-vt em{color:var(--yell);font-style:normal;display:block;}
-.vt-desc{font-size:11px;color:rgba(255,255,255,.44);line-height:1.6;margin-top:11px;}
-.vt-btn{display:inline-block;margin-top:13px;background:var(--yell);color:var(--brown);font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:9px 18px;border-radius:30px;}
-.vt-swipe{text-align:center;margin-top:9px;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.18);}
-
-/* Badges, CTA, footer */
-.badge{background:var(--yell);color:var(--brown);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:6px 14px;border-radius:30px;align-self:flex-start;}
-.frame-top{display:flex;justify-content:space-between;align-items:flex-start;}
-.frame-inner{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;justify-content:space-between;padding:18px;}
-.hl-sq{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(22px,3vmin,36px);color:#fff;line-height:.9;letter-spacing:-.02em;}
-.hl-sq em{color:var(--yell);font-style:normal;}
-.hl-script{font-family:'Dancing Script',cursive;font-weight:700;font-size:clamp(28px,3.8vmin,46px);color:#fff;line-height:1;}
-.desc{font-size:11px;color:rgba(255,255,255,.46);margin-top:8px;letter-spacing:.03em;}
-.row-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
-.handle{font-size:10px;color:rgba(255,255,255,.24);letter-spacing:.08em;}
-.cta{background:var(--yell);color:var(--brown);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:8px 18px;border-radius:30px;}
-
-/* Carousel dots */
-.cdots{display:flex;gap:6px;justify-content:center;margin-top:11px;}
-.cdot{height:3px;width:3px;border-radius:2px;background:rgba(255,255,255,.18);transition:width .35s,background .35s;}
-.cdot.on{width:18px;background:var(--yell);}
-.slide{position:absolute;inset:0;opacity:0;overflow:hidden;}
-
-/* Reel labels */
-.reel-moment{font-family:'Dancing Script',cursive;font-weight:600;font-size:clamp(17px,2.3vmin,25px);color:var(--yell);margin-bottom:6px;}
-.reel-hl{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,2.8vmin,34px);color:#fff;line-height:.9;letter-spacing:-.02em;}
-.reel-sub{font-size:11px;color:rgba(255,255,255,.42);margin-top:9px;}
-.reel-foot{display:flex;justify-content:flex-end;margin-top:14px;}
-.reel-num{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.12em;}
-
-/* Intro */
-.intro-wrap{text-align:center;display:flex;flex-direction:column;align-items:center;}
-.intro-eyebrow{font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:rgba(245,197,24,.75);margin-bottom:22px;}
-.intro-brand{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(48px,7vw,92px);color:var(--white);letter-spacing:-.03em;line-height:.9;margin-top:18px;}
-.intro-campaign{font-family:'Dancing Script',cursive;font-weight:600;font-size:clamp(36px,5vw,70px);color:var(--yell);line-height:1.05;margin-top:6px;}
-.intro-rule{width:38px;height:2px;background:var(--yell);border-radius:2px;margin:22px auto 14px;opacity:.7;}
-.intro-sub{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:rgba(255,255,255,.6);}
-
-/* Scroll hint */
-.scroll-hint{
-  position:relative;z-index:5;
-  text-align:center;padding:22px;
-  background:var(--bg);
-}
-.scroll-hint a{
-  font-size:10px;letter-spacing:.28em;text-transform:uppercase;
-  color:rgba(255,255,255,.28);text-decoration:none;
-  display:inline-flex;flex-direction:column;align-items:center;gap:8px;
-  transition:color .2s;
-}
-.scroll-hint a:hover{color:var(--yell);}
-.scroll-arrow{font-size:18px;animation:bounce 1.8s infinite;}
-@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
-
-/* ═══════════════════════════════════════
-   BRIEF SECTION
-═══════════════════════════════════════ */
-.brief{
-  background:#FAF7F2;
-}
-
-/* Hero del brief */
-.brief-hero{
-  padding:100px 60px 80px;
-  border-top:1px solid rgba(255,255,255,.06);
-  display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;
-  max-width:1200px;margin:0 auto;
-}
-.brief-hero-left{}
-.brief-eyebrow{font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:var(--yell);margin-bottom:20px;}
-.brief-title{
-  font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
-  font-size:clamp(40px,5vw,72px);color:var(--white);
-  line-height:.9;letter-spacing:-.03em;
-}
-.brief-title em{color:var(--yell);font-style:normal;display:block;}
-.brief-subtitle{
-  font-family:'Dancing Script',cursive;
-  font-size:clamp(22px,2.8vw,38px);color:rgba(255,255,255,.4);
-  margin-top:10px;
-}
-.brief-lead{
-  font-size:15px;color:rgba(255,255,255,.5);line-height:1.75;
-  margin-top:28px;max-width:480px;
-}
-.brief-hero-right{}
-
-/* Stats strip */
-.stats-strip{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:1px;background:rgba(255,255,255,.07);
-  border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden;
-}
-.stat{padding:32px 28px;background:rgba(255,255,255,.03);}
-.stat-num{
-  font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
-  font-size:clamp(32px,3.5vw,52px);color:var(--yell);letter-spacing:-.02em;line-height:1;
-}
-.stat-label{font-size:12px;color:rgba(255,255,255,.38);margin-top:6px;line-height:1.4;}
-
-/* Sections common */
-.brief-section{padding:0 60px 90px;max-width:1200px;margin:0 auto;}
-.section-tag{
-  display:inline-block;
-  font-size:9px;letter-spacing:.3em;text-transform:uppercase;
-  color:var(--brown);background:var(--yell);
-  padding:5px 12px;border-radius:30px;margin-bottom:18px;
-}
-.section-title{
-  font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
-  font-size:clamp(28px,3.5vw,48px);color:#fff;letter-spacing:-.02em;line-height:.95;
-  margin-bottom:14px;
-}
-.section-title em{color:var(--yell);font-style:normal;}
-.section-body{font-size:14px;color:rgba(255,255,255,.45);line-height:1.75;max-width:640px;}
-
-/* Divider */
-.divider{height:1px;background:rgba(255,255,255,.06);margin:0 60px;}
-
-/* Concepto block */
-.concepto-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;padding-top:10px;}
-.concepto-quote{
-  font-family:'Dancing Script',cursive;font-size:clamp(28px,3.5vw,50px);
-  color:var(--yell);line-height:1.2;margin-top:12px;
-}
-.concepto-text{font-size:14px;color:rgba(255,255,255,.45);line-height:1.8;}
-.concepto-card{
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-  border-radius:16px;padding:32px;
-}
-.concepto-card-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px;color:#fff;margin-bottom:10px;}
-.concepto-card-body{font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;}
-.concepto-cards{display:flex;flex-direction:column;gap:14px;}
-
-/* Desafio */
-.desafio-layout{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;padding-top:10px;}
-.challenge-box{
-  background:linear-gradient(135deg,rgba(44,16,6,.6),rgba(200,146,42,.12));
-  border:1px solid rgba(200,146,42,.2);
-  border-radius:16px;padding:36px;
-}
-.challenge-label{font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:rgba(200,146,42,.7);margin-bottom:12px;}
-.challenge-text{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:clamp(18px,2.2vw,26px);color:#fff;line-height:1.1;}
-.challenge-sub{font-size:13px;color:rgba(255,255,255,.38);margin-top:12px;line-height:1.65;}
-.solution-box{display:flex;flex-direction:column;gap:16px;}
-.solution-item{display:flex;gap:16px;align-items:flex-start;}
-.solution-icon{font-size:22px;flex-shrink:0;margin-top:2px;}
-.solution-copy{}
-.solution-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:4px;}
-.solution-body{font-size:13px;color:rgba(255,255,255,.38);line-height:1.6;}
-
-/* Arquetipo */
-.arq-layout{display:grid;grid-template-columns:auto 1fr;gap:60px;align-items:center;padding-top:10px;}
-.arq-badge{
-  width:180px;height:180px;border-radius:50%;
-  background:linear-gradient(135deg,rgba(200,146,42,.25),rgba(245,197,24,.08));
-  border:2px solid rgba(245,197,24,.3);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:20px;flex-shrink:0;
-}
-.arq-icon{font-size:42px;margin-bottom:8px;}
-.arq-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:16px;color:var(--yell);letter-spacing:.05em;}
-.arq-text{font-size:14px;color:rgba(255,255,255,.45);line-height:1.75;}
-.arq-nota{
-  display:inline-block;margin-top:18px;
-  font-family:'Dancing Script',cursive;font-size:20px;color:rgba(245,197,24,.6);
-}
-
-/* Pilares */
-.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding-top:10px;}
-.pillar{
-  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
-  border-radius:16px;padding:32px 28px;
-  transition:border-color .3s,background .3s;
-}
-.pillar:hover{background:rgba(245,197,24,.05);border-color:rgba(245,197,24,.2);}
-.pillar-icon{font-size:30px;margin-bottom:14px;}
-.pillar-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:#fff;letter-spacing:-.01em;margin-bottom:8px;}
-.pillar-body{font-size:13px;color:rgba(255,255,255,.38);line-height:1.65;}
-
-/* Formatos */
-.formats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding-top:10px;}
-.format-card{
-  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
-  border-radius:14px;padding:24px 20px;text-align:center;
-}
-.format-icon{font-size:26px;margin-bottom:10px;}
-.format-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:14px;color:#fff;margin-bottom:4px;}
-.format-size{font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.25);text-transform:uppercase;}
-.format-desc{font-size:11px;color:rgba(255,255,255,.35);margin-top:8px;line-height:1.5;}
-
-/* No es */
-.nolist{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding-top:10px;}
-.nocard{
-  background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);
-  border-radius:14px;padding:26px 22px;
-  border-left:3px solid rgba(255,255,255,.08);
-}
-.nocard.stroke{border-left-color:rgba(245,197,24,.5);}
-.nocard-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:15px;color:rgba(255,255,255,.5);margin-bottom:8px;text-decoration:line-through;text-decoration-color:rgba(255,255,255,.2);}
-.nocard-body{font-size:12px;color:rgba(255,255,255,.3);line-height:1.6;}
-
-/* Footer brief */
-.brief-footer{
-  border-top:1px solid rgba(255,255,255,.06);
-  padding:48px 60px;
-  display:flex;justify-content:space-between;align-items:center;
-  max-width:1200px;margin:0 auto;
-}
-.footer-brand{display:flex;flex-direction:column;gap:6px;}
-.footer-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:#fff;}
-.footer-claim{font-family:'Dancing Script',cursive;font-size:18px;color:var(--yell);}
-.footer-meta{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.18);}
-.footer-back a{
-  font-size:10px;letter-spacing:.22em;text-transform:uppercase;
-  color:rgba(255,255,255,.25);text-decoration:none;
-  border:1px solid rgba(255,255,255,.12);padding:10px 20px;border-radius:30px;
-  transition:all .2s;
-}
-.footer-back a:hover{background:rgba(255,255,255,.07);color:#fff;}
-
-@media(max-width:900px){
-  .brief-hero{grid-template-columns:1fr;gap:40px;padding:60px 24px 50px;}
-  .brief-section{padding:0 24px 60px;}
-  .divider{margin:0 24px;}
-  .concepto-grid,.desafio-layout,.arq-layout{grid-template-columns:1fr;gap:30px;}
-  .pillars,.formats-grid,.nolist,.stats-strip{grid-template-columns:1fr;}
-  .brief-footer{flex-direction:column;gap:24px;text-align:center;padding:40px 24px;}
-}
-
-/* ═══════════════════════════════════════
-   PROGRESS BAR — hidden on desktop
-═══════════════════════════════════════ */
-.prog-bar{display:none;}
-.swipe-hint{display:none;}
-
-/* ═══════════════════════════════════════
-   MOBILE — experiencia para teléfono
-═══════════════════════════════════════ */
-@media(max-width:640px){
-
-  /* Evitar cualquier overflow horizontal */
-  html,body{overflow-x:hidden;}
-  #showcase{width:100%;overflow:hidden;}
-
-  /* ── Progress bar estilo Stories ── */
-  .prog-bar{
-    display:flex;
-    position:absolute;
-    top:max(12px,env(safe-area-inset-top));
-    left:12px;right:12px;
-    gap:3px;z-index:900;pointer-events:none;
-  }
-  .pb{flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.22);transition:background .3s;}
-  .pb.pb-done{background:rgba(255,255,255,.8);}
-  .pb.pb-active{background:var(--yell);}
-
-  /* ── Card: ancho completo, alto libre para la nav ── */
-  .scene{
-    align-items:flex-start;
-  }
-  .scene > div{
-    width:100%;
-    position:relative;
-  }
-  .vt{
-    width:100vw !important;
-    height:calc(100svh - 72px) !important;
-    height:calc(100vh - 72px) !important;
-    border-radius:0 !important;
-  }
-  /* Intro: columna centrada en el espacio disponible */
-  .intro-wrap{
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:flex-start;
-    width:100%;
-    height:calc(100svh - 72px);
-    height:calc(100vh - 72px);
-    padding:60px 28px 28px;
-    text-align:left;
-  }
-
-  /* ── Ocultar elementos solo desktop ── */
-  .ptag{display:none;}
-  .arrow{display:none;}
-  .hud{display:none;}
-  .cdots{display:none;}
-
-  /* ── Contenido interno ── */
-  .vt-inner{
-    padding:44px 22px 28px;
-    padding-top:max(44px,env(safe-area-inset-top));
-  }
-
-  /* ── Tipografías escaladas para full-screen ── */
-  .hl-vt{font-size:clamp(30px,8vw,46px) !important;line-height:1.05 !important;}
-  .hl-vt em{display:block;}
-  .hl-script{font-size:clamp(32px,9vw,50px) !important;line-height:1.1 !important;}
-  .reel-hl{font-size:clamp(30px,8vw,46px) !important;line-height:1.05 !important;}
-  .reel-moment{font-size:clamp(18px,5vw,26px) !important;margin-bottom:10px;}
-  .reel-sub{font-size:13px !important;}
-  .vt-eye{font-size:10px;letter-spacing:.2em;margin-bottom:10px;}
-  .vt-desc{font-size:13px !important;line-height:1.55;margin-top:12px;}
-  .vt-btn{font-size:11px;padding:11px 22px;margin-top:16px;}
-  .badge{font-size:10px;padding:7px 14px;}
-  .cta{font-size:11px;padding:10px 20px;}
-  .handle{font-size:11px;}
-
-  /* ── Títulos brief — line-height corregido ── */
-  .brief .brief-title{line-height:1.0 !important;font-size:clamp(32px,9vw,52px);}
-  .brief .section-title{line-height:1.1 !important;font-size:clamp(24px,7vw,40px);}
-  .brief .concepto-quote{line-height:1.3 !important;}
-  .brief .challenge-text{line-height:1.2 !important;}
-  .brief .pillar-title{line-height:1.1 !important;}
-  .intro-brand{line-height:1.0 !important;}
-  .intro-campaign{line-height:1.1 !important;}
-
-  /* ── Logo más grande en mobile ── */
-  .logo-mark img{width:100px;}
-  .logo-mark.sm img{width:80px;}
-  .logo-mark.lg img{width:130px;}
-
-  /* ── Row foot: no desborde ── */
-  .row-foot{flex-wrap:wrap;gap:8px;margin-top:14px;}
-
-  /* ── Intro pantalla completa ── */
-  .intro-wrap{padding:0 28px;text-align:left;align-items:flex-start;}
-  .intro-eyebrow{margin-bottom:16px;}
-  .intro-brand{font-size:clamp(48px,13vw,72px);}
-  .intro-campaign{font-size:clamp(34px,9.5vw,54px);}
-  .intro-rule{margin:18px 0 12px;}
-  .intro-sub{text-align:left;}
-
-  /* ── Nav: fixed en la franja de 72px bajo la card ── */
-  .nav{
-    position:fixed;
-    bottom:max(10px,env(safe-area-inset-bottom));
-    left:12px;right:12px;
-    transform:none;
-    justify-content:space-around;
-    padding:5px 4px;gap:0;
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-    border-radius:28px;
-    z-index:1000;
-  }
-  .nav::-webkit-scrollbar{display:none;}
-  .nav-item{padding:6px 8px;flex-shrink:0;gap:2px;}
-  .nav-lbl{display:block;font-size:6px;letter-spacing:.1em;}
-  .nav-icon{font-size:11px;color:rgba(255,255,255,.7);}
-  .nav-item.active .nav-icon{color:#fff;}
-  .nav-item.active .nav-lbl{color:#fff;}
-
-  /* ── Swipe hint ── */
-  .swipe-hint{
-    display:block;
-    position:absolute;
-    bottom:max(68px,calc(env(safe-area-inset-bottom)+58px));
-    left:50%;transform:translateX(-50%);
-    font-size:8px;letter-spacing:.24em;text-transform:uppercase;
-    color:rgba(255,255,255,.3);pointer-events:none;
-    white-space:nowrap;z-index:700;
-    animation:fadeHint 4s 2s ease-out forwards;
-  }
-  @keyframes fadeHint{0%{opacity:1}75%{opacity:.15}100%{opacity:0;}}
-
-  /* ── Scroll hint ── */
-  .scroll-hint{padding:14px;}
-
-  /* ── Brief section ── */
-  .brief-title{font-size:clamp(30px,9vw,52px);}
-  .stat-num{font-size:clamp(28px,8vw,44px);}
-  .brief-hero{padding:52px 20px 44px;}
-  .brief-section{padding:0 20px 50px;}
-  .divider{margin:0 20px;}
-  .brief-footer{padding:36px 20px;}
-  .section-title{font-size:clamp(24px,7vw,40px);}
-}
-</style>
+    /* ── FOOTER ──────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 36px 20px 56px;
+      text-align: center;
+    }
+    .footer-logo-wrap {
+      display: inline-block;
+      background: #fff;
+      border-radius: 6px;
+      padding: 4px 14px 2px;
+      margin-bottom: 16px;
+    }
+    .footer-logo-wrap img { height: 26px; display: block; }
+    .footer-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+    .footer-role {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-top: 5px;
+      text-transform: uppercase;
+    }
+    .footer-site {
+      font-size: 11px;
+      color: #333;
+      margin-top: 20px;
+      letter-spacing: 1px;
+    }
+    .footer-site a { color: #444; text-decoration: none; }
+  </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════
-     SHOWCASE
-═══════════════════════════════ -->
-<div id="showcase">
+<!-- HEADER -->
+<header class="header">
+  <div class="header-logo"><span>ÉL</span> CRUX</div>
+  <div class="header-badge">REDISEÑO 2026</div>
+</header>
 
-  <!-- Progress bar (visible solo en móvil) -->
-  <div class="prog-bar" id="prog-bar">
-    <div class="pb" id="pb0"></div>
-    <div class="pb" id="pb1"></div>
-    <div class="pb" id="pb2"></div>
-    <div class="pb" id="pb3"></div>
-    <div class="pb" id="pb4"></div>
-    <div class="pb" id="pb5"></div>
-    <div class="pb" id="pb6"></div>
-  </div>
-
-  <div class="hud">
-    <span class="hud-l">Castaño · Campaña Digital</span>
-    <span class="hud-r">Empieza bien tu día.</span>
-  </div>
-
-  <div class="arrow arrow-prev" id="btn-prev">&#8592;</div>
-  <div class="arrow arrow-next" id="btn-next">&#8594;</div>
-
-  <nav class="nav" id="nav-bar">
-    <div class="nav-item active" data-i="0"><span class="nav-icon">✦</span><span class="nav-lbl">Inicio</span></div>
-    <div class="nav-item" data-i="1"><span class="nav-icon">◼</span><span class="nav-lbl">Post 1</span></div>
-    <div class="nav-item" data-i="2"><span class="nav-icon">◼</span><span class="nav-lbl">Post 2</span></div>
-    <div class="nav-item" data-i="3"><span class="nav-icon">◎</span><span class="nav-lbl">Story 1</span></div>
-    <div class="nav-item" data-i="4"><span class="nav-icon">◎</span><span class="nav-lbl">Story 2</span></div>
-    <div class="nav-item" data-i="5"><span class="nav-icon">▶</span><span class="nav-lbl">Reel</span></div>
-    <div class="nav-item" data-i="6"><span class="nav-icon">▦</span><span class="nav-lbl">Slide</span></div>
-  </nav>
-
-  <!-- S0: INTRO -->
-  <div class="scene" id="s0">
-    <div class="intro-wrap">
-      <p class="intro-eyebrow" id="i-eye">Campaña Digital · 2026</p>
-      <div class="logo-mark lg" id="i-logo"><img src="logo-white.svg" alt="Castaño"></div>
-      <div class="intro-brand" id="i-brand">Empieza</div>
-      <div class="intro-campaign" id="i-camp">bien tu día.</div>
-      <div class="intro-rule" id="i-rule"></div>
-      <p class="intro-sub" id="i-sub">2 Posts · 2 Stories · 1 Reel · 1 Carrusel</p>
-    </div>
-  </div>
-
-  <!-- S1: POST 1 — Saludable (video) -->
-  <div class="scene" id="s1">
-    <div style="position:relative">
-      <div class="ptag">Post vertical · 1080×1920</div>
-      <div class="vt shadow-box" id="p1">
-        <video class="bg" autoplay muted loop playsinline><source src="vid-horno.mp4" type="video/mp4"></video>
-        <div class="overlay-dark"></div>
-        <div class="vt-inner">
-          <div class="vt-top">
-            <div class="logo-mark" id="p1-logo"><img src="logo-white.svg" alt="Castaño"></div>
-            <div class="badge" id="p1-badge">Línea Saludable</div>
-          </div>
-          <div class="vt-bot">
-            <p class="vt-eye">Rico · Sano · Cercano</p>
-            <div class="hl-vt" id="p1-hl">Tu mañana,<br>a tu <em>manera.</em></div>
-            <p class="vt-desc" id="p1-desc">Pan integral · Prebiótico · Proteína</p>
-            <div class="row-foot">
-              <span class="handle">@castano_chile</span>
-              <div class="cta" id="p1-cta">Ver más</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- S2: POST 2 — Antojo (foto) -->
-  <div class="scene" id="s2">
-    <div style="position:relative">
-      <div class="ptag">Post vertical · 1080×1920</div>
-      <div class="vt shadow-box" id="p2">
-        <img class="bg" src="photo-berliner.jpg" alt="">
-        <div class="overlay-dark"></div>
-        <div class="vt-inner">
-          <div class="vt-top">
-            <div class="logo-mark" id="p2-logo"><img src="logo-white.svg" alt="Castaño"></div>
-            <div class="badge" style="background:#fff;color:var(--brown);" id="p2-badge">Pastelería</div>
-          </div>
-          <div class="vt-bot">
-            <p class="vt-eye">Cada antojo cuenta</p>
-            <div class="hl-script" id="p2-hl">Felicidad.</div>
-            <p class="vt-desc" id="p2-desc">Pan dulce recién horneado · Todos los días</p>
-            <div class="row-foot">
-              <span class="handle">@castano_chile</span>
-              <div class="cta" id="p2-cta">Ver más</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- S3: STORY 1 (video influ) -->
-  <div class="scene" id="s3">
-    <div style="position:relative">
-      <div class="ptag">Story · 1080×1920</div>
-      <div class="vt shadow-box" id="st1">
-        <video class="bg" id="st1-vid" autoplay muted playsinline><source src="vid-influ.mp4" type="video/mp4"></video>
-        <div class="overlay-mid"></div>
-        <div class="vt-inner">
-          <div class="vt-top">
-            <div class="logo-mark sm" id="st1-logo"><img src="logo-white.svg" alt="Castaño"></div>
-            <span class="vt-x">×</span>
-          </div>
-          <div class="vt-bot" id="st1-bot">
-            <p class="vt-eye">Rico · Sano · Cercano</p>
-            <div class="hl-vt" id="st1-hl">El pan que<br>te <em>cuida.</em></div>
-            <p class="vt-desc" id="st1-desc">Porque comer bien no tiene que ser aburrido. Pan artesanal para cada momento.</p>
-            <div class="vt-btn" id="st1-btn">Pedir ahora ↗</div>
-            <p class="vt-swipe">↑ desliza para ver más</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- S4: STORY 2 (video pancitos) -->
-  <div class="scene" id="s4">
-    <div style="position:relative">
-      <div class="ptag">Story · 1080×1920</div>
-      <div class="vt shadow-box" id="st2">
-        <video class="bg" autoplay muted loop playsinline><source src="vid-horno.mp4" type="video/mp4"></video>
-        <div class="overlay-mid"></div>
-        <div class="vt-inner">
-          <div class="vt-top">
-            <div class="logo-mark sm" id="st2-logo"><img src="logo-white.svg" alt="Castaño"></div>
-            <span class="vt-x">×</span>
-          </div>
-          <div class="vt-bot" id="st2-bot">
-            <p class="vt-eye">Cada mañana</p>
-            <div class="hl-vt" id="st2-hl">Recién salido<br>del <em>horno.</em></div>
-            <p class="vt-desc" id="st2-desc">Pancitos frescos todos los días. Porque el buen pan hace mejor el día.</p>
-            <div class="vt-btn" id="st2-btn">Ver productos ↗</div>
-            <p class="vt-swipe">↑ desliza para ver más</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- S5: REEL VERTICAL CARRUSEL -->
-  <div class="scene" id="s5">
-    <div style="position:relative">
-      <div class="ptag">Reel / Carrusel vertical · 1080×1920</div>
-      <div class="vt shadow-box" style="position:relative;">
-        <div class="slide" id="rA">
-          <video class="bg" autoplay muted loop playsinline><source src="vid-varios.mp4" type="video/mp4"></video>
-          <div class="overlay-mid"></div>
-          <div class="vt-inner">
-            <div class="vt-top"><div class="logo-mark sm"><img src="logo-white.svg" alt="Castaño"></div><span class="vt-x">×</span></div>
-            <div class="vt-bot">
-              <p class="reel-moment">☀ Desayuno</p>
-              <div class="reel-hl">Un buen día<br>empieza aquí.</div>
-              <p class="reel-sub">Panes, tostadas y más para tu mañana.</p>
-              <div class="reel-foot"><span class="reel-num">01 / 03</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="slide" id="rB">
-          <video class="bg" autoplay muted loop playsinline><source src="vid-comida.mp4" type="video/mp4"></video>
-          <div class="overlay-mid"></div>
-          <div class="vt-inner">
-            <div class="vt-top"><div class="logo-mark sm"><img src="logo-white.svg" alt="Castaño"></div><span class="vt-x">×</span></div>
-            <div class="vt-bot">
-              <p class="reel-moment">🥗 Almuerzo</p>
-              <div class="reel-hl">Rico,<br>fresco<br>y sano.</div>
-              <p class="reel-sub">Bowls y ensaladas del día.</p>
-              <div class="reel-foot"><span class="reel-num">02 / 03</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="slide" id="rC">
-          <video class="bg" autoplay muted loop playsinline><source src="vid-torta.mp4" type="video/mp4"></video>
-          <div class="overlay-mid"></div>
-          <div class="vt-inner">
-            <div class="vt-top"><div class="logo-mark sm"><img src="logo-white.svg" alt="Castaño"></div><span class="vt-x">×</span></div>
-            <div class="vt-bot">
-              <p class="reel-moment">✨ Antojo</p>
-              <div class="reel-hl">El antojo<br>que<br>merecías.</div>
-              <p class="reel-sub">Pastelería, brownies, donuts y más.</p>
-              <div class="reel-foot"><span class="reel-num">03 / 03</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="cdots"><div class="cdot on" id="rd0"></div><div class="cdot" id="rd1"></div><div class="cdot" id="rd2"></div></div>
-    </div>
-  </div>
-
-  <!-- S6: CARRUSEL VERTICAL -->
-  <div class="scene" id="s6">
-    <div style="position:relative">
-      <div class="ptag">Carrusel vertical · 1080×1920</div>
-      <div class="vt shadow-box" style="position:relative;">
-        <div class="slide" id="cA">
-          <img class="bg" src="photo-tostadas.jpg" alt="">
-          <div class="overlay-dark"></div>
-          <div class="vt-inner">
-            <div class="vt-top"><div class="logo-mark sm"><img src="logo-white.svg" alt="Castaño"></div><div class="badge">🌿 Saludable</div></div>
-            <div class="vt-bot">
-              <p class="vt-eye">Empieza bien tu día.</p>
-              <div class="hl-vt">Rico<br>por dentro.</div>
-              <p class="vt-desc">Línea integral con más nutrientes.</p>
-              <div class="reel-foot"><span class="reel-num">01 / 03</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="slide" id="cB">
-          <img class="bg" src="photo-bowls.jpg" alt="" style="object-position:center 30%;">
-          <div class="overlay-dark"></div>
-          <div class="vt-inner">
-            <div class="vt-top"><div class="logo-mark sm"><img src="logo-white.svg" alt="Castaño"></div><div class="badge">🥗 Almuerzo</div></div>
-            <div class="vt-bot">
-              <p class="vt-eye">Empieza bien tu día.</p>
-              <div class="hl-vt">Fresco,<br>cerca<br>de ti.</div>
-              <p class="vt-desc">Bowls, ensaladas y almuerzos.</p>
-              <div class="reel-foot"><span class="reel-num">02 / 03</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="slide" id="cC">
-          <img class="bg" src="photo-croissant.jpg" alt="" style="object-position:center 40%;">
-          <div class="overlay-dark"></div>
-          <div class="vt-inner">
-            <div class="vt-top"><div class="logo-mark sm"><img src="logo-white.svg" alt="Castaño"></div><div class="badge" style="background:#fff;color:var(--brown);">✨ Pastelería</div></div>
-            <div class="vt-bot">
-              <p class="vt-eye">Empieza bien tu día.</p>
-              <div class="hl-script" style="font-size:clamp(26px,3.5vmin,40px);">Hoy hago<br>teletrabajo.</div>
-              <p class="vt-desc">Croissants, donuts y más.</p>
-              <div class="reel-foot"><span class="reel-num">03 / 03</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="cdots"><div class="cdot on" id="cd0"></div><div class="cdot" id="cd1"></div><div class="cdot" id="cd2"></div></div>
-    </div>
-  </div>
-
-  <!-- Swipe hint (visible solo en móvil, desaparece solo) -->
-  <div class="swipe-hint">← desliza para navegar →</div>
-
-</div><!-- /#showcase -->
-
-<!-- Scroll hint -->
-<div class="scroll-hint">
-  <a href="#brief">
-    <span>Ver estrategia de campaña</span>
-    <span class="scroll-arrow">↓</span>
-  </a>
-</div>
-
-<!-- ═══════════════════════════════
-     BRIEF
-═══════════════════════════════ -->
-<section class="brief" id="brief">
-
-  <!-- Hero -->
-  <div class="brief-hero">
-    <div class="brief-hero-left">
-      <p class="brief-eyebrow">Estrategia de campaña · 2026</p>
-      <h1 class="brief-title">Empieza<em>bien tu día.</em></h1>
-      <p class="brief-subtitle">Campaña Digital Castaño</p>
-      <p class="brief-author">Diseño &amp; Estrategia · <strong>Martín Pizarro España</strong></p>
-      <p class="brief-lead">Una campaña construida desde la identidad más profunda de la marca: el cuidado cotidiano. Diseñada para rejuvenecer a Castaño sin perder su esencia de 92 años, conectando con un público nuevo desde lo que siempre los hizo grandes.</p>
-    </div>
-    <div class="brief-hero-right">
-      <div class="stats-strip">
-        <div class="stat">
-          <div class="stat-num">92</div>
-          <div class="stat-label">años de historia en Chile</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">+200</div>
-          <div class="stat-label">sucursales a lo largo de Chile</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">+2K</div>
-          <div class="stat-label">colaboradores en todo Chile</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Concepto -->
-  <div class="brief-section" style="padding-top:70px;">
-    <span class="section-tag">El concepto</span>
-    <div class="concepto-grid">
-      <div>
-        <h2 class="section-title">¿Por qué<em>"Empieza bien tu día"?</em></h2>
-        <p class="concepto-text" style="margin-top:20px;">Castaño tiene una variedad que va mucho más allá de la panadería: tostadas y bowls para el desayuno, almuerzos frescos para el oficinista, croissants y berlinesas para el antojo del break, y una línea saludable para quien cuida lo que come. La campaña toma ese universo y lo convierte en un solo momento: el comienzo de tu día.</p>
-        <p class="concepto-text" style="margin-top:14px;">El mensaje es simple y honesto: sin importar lo que elijas, si empiezas bien tu día, Castaño estuvo ahí.</p>
-      </div>
-      <div class="concepto-cards">
-        <div class="concepto-card">
-          <div class="concepto-card-title">🎯 Objetivo principal</div>
-          <div class="concepto-card-body">Rejuvenecer la percepción de marca atrayendo a consumidores de 25–40 años que valoran lo saludable y lo auténtico, sin alienar al consumidor fiel de mayor edad.</div>
-        </div>
-        <div class="concepto-card">
-          <div class="concepto-card-title">💬 Mensaje central</div>
-          <div class="concepto-card-body">Castaño es la panadería que te cuida todos los días. Con productos ricos, sanos y accesibles para cada momento de tu rutina.</div>
-        </div>
-        <div class="concepto-card">
-          <div class="concepto-card-title">📍 Plataformas</div>
-          <div class="concepto-card-body">Instagram y TikTok como canales principales. Contenido nativo vertical optimizado para feed, Stories y Reels.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Desafío -->
-  <div class="brief-section" style="padding-top:70px;">
-    <span class="section-tag">El desafío estratégico</span>
-    <div class="desafio-layout">
-      <div class="challenge-box">
-        <p class="challenge-label">Problema detectado</p>
-        <p class="challenge-text">La brecha generacional de Castaño</p>
-        <p class="challenge-sub">Los consumidores más fieles de Castaño son adultos que crecieron con la marca. El desafío estratégico es atraer a una generación más joven que desconoce la marca o la percibe como "antigua", sin romper el vínculo emocional con quienes ya la aman.</p>
-      </div>
-      <div class="solution-box">
-        <div class="solution-item">
-          <span class="solution-icon">🌱</span>
-          <div class="solution-copy">
-            <div class="solution-title">Línea saludable como puerta de entrada</div>
-            <div class="solution-body">Pan proteína, prebiótico, linaza chía. Castaño ya tiene los productos. La campaña los visibiliza para el consumidor joven que busca comer bien sin complicarse.</div>
-          </div>
-        </div>
-        <div class="solution-item">
-          <span class="solution-icon">📲</span>
-          <div class="solution-copy">
-            <div class="solution-title">Contenido nativo vertical</div>
-            <div class="solution-body">Posts, stories y reels diseñados para el comportamiento digital de 25–40 años. Formato que hablan el idioma de TikTok e Instagram sin perder la calidez de la marca.</div>
-          </div>
-        </div>
-        <div class="solution-item">
-          <span class="solution-icon">🤝</span>
-          <div class="solution-copy">
-            <div class="solution-title">Tono cercano, no corporativo</div>
-            <div class="solution-body">Castaño habla como alguien de la familia, no como una multinacional. La campaña mantiene ese tono cálido y honesto que es el corazón de la marca.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Arquetipo -->
-  <div class="brief-section" style="padding-top:70px;">
-    <span class="section-tag">Arquetipo de marca</span>
-    <div class="arq-layout">
-      <div class="arq-badge">
-        <span class="arq-icon">🫶</span>
-        <span class="arq-name">El Cuidador</span>
-      </div>
-      <div>
-        <h2 class="section-title">La marca que<em>te cuida.</em></h2>
-        <p class="arq-text">El arquetipo del Cuidador es el alma de Castaño. No busca conquistar ni revolucionar: su misión es acompañar y nutrir a su comunidad en cada momento del día. Habla con calidez, como alguien de la familia. Se preocupa por tu bienestar sin presumir de ello.</p>
-        <p class="arq-text" style="margin-top:14px;">La campaña "Empieza bien tu día" es la expresión más directa de ese arquetipo: desde el desayuno hasta el break de la tarde, Castaño está ahí con algo rico, fresco y pensado para ti.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Pilares -->
-  <div class="brief-section" style="padding-top:70px;">
-    <span class="section-tag">Pilares de comunicación</span>
-    <h2 class="section-title" style="margin-bottom:28px;">Tres palabras.<em>Una campaña.</em></h2>
-    <div class="pillars">
-      <div class="pillar">
-        <div class="pillar-icon">🍞</div>
-        <div class="pillar-title">Rico</div>
-        <div class="pillar-body">El sabor es la razón de existir. Castaño no sacrifica el gusto por ningún motivo. Cada producto es una experiencia que alegra el momento.</div>
-      </div>
-      <div class="pillar">
-        <div class="pillar-icon">🌿</div>
-        <div class="pillar-title">Sano</div>
-        <div class="pillar-body">La línea saludable de Castaño demuestra que comer bien no tiene que ser aburrido ni caro. Pan proteína, prebiótico, integral: para el Castaño de hoy.</div>
-      </div>
-      <div class="pillar">
-        <div class="pillar-icon">🤗</div>
-        <div class="pillar-title">Cercano</div>
-        <div class="pillar-body">Castaño está en el barrio, en el mall, en el super. Siempre a la vuelta. Y habla como la gente habla: sin poses, con cariño y sin complicaciones.</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Formatos -->
-  <div class="brief-section" style="padding-top:70px;">
-    <span class="section-tag">Piezas de campaña</span>
-    <h2 class="section-title" style="margin-bottom:28px;">Material<em>producido.</em></h2>
-    <div class="formats-grid">
-      <div class="format-card">
-        <div class="format-icon">📸</div>
-        <div class="format-name">Post vertical</div>
-        <div class="format-size">1080 × 1920</div>
-        <div class="format-desc">Línea saludable y pastelería. Para feed de Instagram con máximo impacto visual.</div>
-      </div>
-      <div class="format-card">
-        <div class="format-icon">📱</div>
-        <div class="format-name">Story</div>
-        <div class="format-size">1080 × 1920</div>
-        <div class="format-desc">Efímero e inmediato. Fondo en video, texto con CTA directo al pedido.</div>
-      </div>
-      <div class="format-card">
-        <div class="format-icon">▶</div>
-        <div class="format-name">Reel</div>
-        <div class="format-size">1080 × 1920</div>
-        <div class="format-desc">Tres momentos del día (desayuno, almuerzo, antojo) en formato reel con video real.</div>
-      </div>
-      <div class="format-card">
-        <div class="format-icon">⊞</div>
-        <div class="format-name">Carrusel</div>
-        <div class="format-size">1080 × 1920</div>
-        <div class="format-desc">3 slides verticales que narran la propuesta de valor completa de la campaña.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <div style="max-width:1200px;margin:0 auto;">
-    <div class="divider" style="margin:0;"></div>
-    <div class="brief-footer">
-      <div class="footer-brand">
-        <span class="footer-name">Castaño</span>
-        <span class="footer-claim">Empieza bien tu día.</span>
-      </div>
-      <div class="footer-designer">
-        <span class="footer-designer-label">Diseño &amp; Estrategia</span>
-        <span class="footer-designer-name">Martín Pizarro España</span>
-      </div>
-      <span class="footer-meta">Campaña Digital · Chile · 2026</span>
-      <div class="footer-back"><a href="#showcase">↑ Ver piezas</a></div>
-    </div>
-  </div>
-
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">Diseño de Packaging · Martín Pizarro España</p>
+  <h1 class="hero-title">MAGNESIO<br>DEPORTIVO</h1>
+  <p class="hero-sub">El Crux · Rediseño Funcional · Super Chunky</p>
 </section>
 
+<!-- 3D VIEWER -->
+<div class="viewer-wrap">
+  <canvas id="three-canvas"></canvas>
+  <div class="viewer-hint" id="hint">ARRASTRA PARA ROTAR &nbsp;·&nbsp; PELLIZCA PARA ZOOM</div>
+</div>
+
+<!-- TAGLINE -->
+<div class="tagline">
+  <div class="tagline-main">MÁXIMA<br>ADHERENCIA</div>
+  <div class="tagline-sub">Que el sudor no sea una excusa</div>
+</div>
+
+<!-- EL PRODUCTO -->
+<div class="section">
+  <div class="section-label">El Producto</div>
+  <div class="section-title">Titan Mix · 60g</div>
+  <p class="section-body">El Crux es una marca chilena de equipamiento para escalada deportiva. Su producto es la bolsa de magnesio en polvo de 60g, esencial para mejorar la adherencia de las manos a la roca al absorber la humedad, reduciendo el riesgo de caídas y mejorando el rendimiento.</p>
+</div>
+
+<!-- RENDER -->
+<div class="render-section">
+  <img src="render-3d.png" alt="Rediseño Magnesio El Crux" class="render-img">
+</div>
+
+<!-- PUNTOS CRÍTICOS -->
+<div class="section" style="padding-bottom:20px">
+  <div class="section-label">Puntos Críticos</div>
+  <div class="section-title">¿Por qué rediseñar?</div>
+  <p class="section-body">El rediseño no responde a una necesidad estética, sino a una necesidad funcional. El empaque original presenta problemas estructurales en la experiencia de uso.</p>
+</div>
+
+<div class="cards">
+  <div class="card">
+    <div class="card-num">01</div>
+    <div class="card-title">Dosificación imprecisa</div>
+    <p class="card-body">No existe control sobre la cantidad dispensada, generando desperdicio constante de producto en cada uso.</p>
+  </div>
+  <div class="card">
+    <div class="card-num">02</div>
+    <div class="card-title">Pérdida de producto</div>
+    <p class="card-body">La bolsa zip no sella herméticamente con el movimiento. En la mochila del escalador, el polvo escapa y contamina otros objetos.</p>
+  </div>
+  <div class="card">
+    <div class="card-num">03</div>
+    <div class="card-title">Experiencia de usuario</div>
+    <p class="card-body">Al ser más difícil dosificar, es impreciso para nuevos escaladores saber cuánto magnesio necesitan realmente.</p>
+  </div>
+</div>
+
+<!-- REPOSICIONAMIENTO -->
+<div class="section" style="padding-bottom:20px">
+  <div class="section-label">Reposicionamiento</div>
+  <div class="section-title">Nueva Propuesta de Valor</div>
+  <p class="section-body">La propuesta es reposicionar la marca en el segmento de innovación funcional como principal valor diferenciador.</p>
+</div>
+
+<div class="positioning">
+  <div class="pos-row">
+    <div class="pos-card">
+      <div class="pos-label">Antes</div>
+      <div class="pos-item">Equip. básico</div>
+      <div class="pos-item">Precio accesible</div>
+      <div class="pos-item">Diseño genérico</div>
+    </div>
+    <div class="pos-card new">
+      <div class="pos-label">Nuevo</div>
+      <div class="pos-item">Alto rendimiento</div>
+      <div class="pos-item">Innovación funcional</div>
+      <div class="pos-item">Experiencia superior</div>
+    </div>
+  </div>
+</div>
+
+<!-- GALERÍA -->
+<div class="section" style="padding-bottom:20px">
+  <div class="section-label">Galería</div>
+  <div class="section-title">El Producto en Contexto</div>
+</div>
+
+<div class="gallery-scroll">
+  <div class="gallery-row">
+    <img src="foto-explosion.jpg" alt="Magnesio explosión">
+    <img src="foto-bolsa.webp" alt="Bolsa magnesio">
+    <img src="foto-outdoor.jpg" alt="Outdoor escalada">
+    <img src="foto-climbing.jpg" alt="Escalada deportiva">
+    <img src="mockup-can.png" alt="Mockup envase">
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo-wrap">
+    <img src="logo-crux.webp" alt="El Crux">
+  </div>
+  <div class="footer-name">MARTÍN PIZARRO ESPAÑA</div>
+  <div class="footer-role">Diseño Gráfico · 2026</div>
+  <div class="footer-site"><a href="https://www.elcruxtienda.cl">www.elcruxtienda.cl</a></div>
+</footer>
+
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-const TOTAL = 7;
-let cur = 0, autoPlay = true;
-let autoTimer = null, reelTimer = null, carTimer = null;
+// ── SETUP ──────────────────────────────────────────────────────────────
+const canvas = document.getElementById('three-canvas');
+const wrap   = canvas.parentElement;
+const W = () => wrap.clientWidth;
+const H = () => wrap.clientHeight;
 
-// Sequential video: story 1
-const st1vid = document.getElementById('st1-vid');
-const seqVids = ['vid-influ.mp4','vid-influ2.mp4'];
-let seqIdx = 0;
-st1vid.addEventListener('ended', () => {
-  seqIdx = (seqIdx + 1) % seqVids.length;
-  st1vid.src = seqVids[seqIdx]; st1vid.play();
-});
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(W(), H());
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.3;
 
-function setNav(i){
-  document.querySelectorAll('.nav-item').forEach((el,idx)=>{
-    el.className = idx===i ? 'nav-item active' : 'nav-item';
-  });
-}
+const scene  = new THREE.Scene();
+scene.background = new THREE.Color(0x060606);
+scene.fog = new THREE.FogExp2(0x060606, 0.09);
 
-function setProgress(i){
-  for(let k=0;k<TOTAL;k++){
-    const el=document.getElementById('pb'+k);
-    if(!el) return;
-    el.className = k<i ? 'pb pb-done' : k===i ? 'pb pb-active' : 'pb';
+const camera = new THREE.PerspectiveCamera(40, W() / H(), 0.1, 100);
+camera.position.set(0, 0.3, 4.8);
+
+// ── LIGHTING ───────────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xffffff, 0.12));
+
+const main = new THREE.DirectionalLight(0xffffff, 2.0);
+main.position.set(-3, 6, 4);
+main.castShadow = true;
+main.shadow.mapSize.set(1024, 1024);
+scene.add(main);
+
+const fill = new THREE.DirectionalLight(0xffe8d0, 0.35);
+fill.position.set(5, 1, 3);
+scene.add(fill);
+
+const rim = new THREE.DirectionalLight(0x8899ff, 0.25);
+rim.position.set(0, -3, -5);
+scene.add(rim);
+
+const redGlow = new THREE.PointLight(0xcc0000, 1.2, 7);
+redGlow.position.set(-2.5, 0.5, 2);
+scene.add(redGlow);
+
+const topGlow = new THREE.PointLight(0xffffff, 0.4, 5);
+topGlow.position.set(0, 4, 2);
+scene.add(topGlow);
+
+// ── LABEL TEXTURE ──────────────────────────────────────────────────────
+function makeLabelTex() {
+  const TW = 2048, TH = 1024;
+  const cv = document.createElement('canvas');
+  cv.width = TW; cv.height = TH;
+  const g = cv.getContext('2d');
+
+  // White body
+  g.fillStyle = '#F8F8F8';
+  g.fillRect(0, 0, TW, TH * 0.575);
+
+  // Top thin highlight
+  g.fillStyle = '#E2E2E2';
+  g.fillRect(0, 0, TW, TH * 0.014);
+
+  // Red separator band
+  g.fillStyle = '#C80000';
+  g.fillRect(0, TH * 0.575, TW, TH * 0.072);
+
+  // Red gradient middle
+  const grd = g.createLinearGradient(0, TH * 0.647, 0, TH * 0.83);
+  grd.addColorStop(0,   '#A50000');
+  grd.addColorStop(0.6, '#780000');
+  grd.addColorStop(1,   '#500000');
+  g.fillStyle = grd;
+  g.fillRect(0, TH * 0.647, TW, TH * 0.183);
+
+  // Black bottom
+  g.fillStyle = '#0C0C0C';
+  g.fillRect(0, TH * 0.83, TW, TH * 0.17);
+
+  // É CRUX
+  g.fillStyle = '#CC0000';
+  g.font = `bold ${TH * 0.072}px 'Arial Black', Impact, sans-serif`;
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.fillText('É CRUX', TW * 0.5, TH * 0.085);
+
+  // MAGNESIO
+  g.fillStyle = '#111111';
+  g.font = `900 ${TH * 0.228}px 'Arial Black', Impact, sans-serif`;
+  g.fillText('MAGNESIO', TW * 0.5, TH * 0.295);
+
+  // DEPORTIVO
+  g.font = `900 ${TH * 0.19}px 'Arial Black', Impact, sans-serif`;
+  g.fillText('DEPORTIVO', TW * 0.5, TH * 0.508);
+
+  // MÁXIMA ADHERENCIA on red band
+  g.fillStyle = '#ffffff';
+  g.font = `700 ${TH * 0.047}px 'Arial', sans-serif`;
+  g.fillText('M Á X I M A   A D H E R E N C I A', TW * 0.5, TH * 0.611);
+
+  // Chalk crystal pile
+  const cx = TW * 0.5, cy = TH * 0.765;
+  const pw = TW * 0.16, ph = TH * 0.14;
+  g.fillStyle = 'rgba(255,255,255,0.92)';
+  g.beginPath();
+  g.moveTo(cx, cy - ph);
+  g.lineTo(cx - pw, cy + ph * 0.3);
+  g.lineTo(cx - pw * 0.5, cy + ph * 0.3);
+  g.lineTo(cx - pw * 0.6, cy + ph * 0.6);
+  g.lineTo(cx + pw * 0.6, cy + ph * 0.6);
+  g.lineTo(cx + pw * 0.5, cy + ph * 0.3);
+  g.lineTo(cx + pw, cy + ph * 0.3);
+  g.closePath();
+  g.fill();
+
+  // Chalk texture dots
+  for (let i = 0; i < 60; i++) {
+    const rx = cx + (Math.random() - 0.5) * pw * 2.2;
+    const ry = cy + (Math.random() * ph * 0.5);
+    g.beginPath();
+    g.arc(rx, ry, TH * 0.007 + Math.random() * TH * 0.005, 0, Math.PI * 2);
+    g.fillStyle = `rgba(200,200,200,${Math.random() * 0.5 + 0.1})`;
+    g.fill();
   }
+
+  // SUPER CHUNKY
+  g.fillStyle = '#ffffff';
+  g.font = `900 ${TH * 0.097}px 'Arial Black', Impact, sans-serif`;
+  g.textBaseline = 'middle';
+  g.fillText('SUPER CHUNKY', TW * 0.5, TH * 0.895);
+
+  // ROCOSO
+  g.fillStyle = '#888888';
+  g.font = `600 ${TH * 0.055}px 'Arial', sans-serif`;
+  g.fillText('ROCOSO', TW * 0.5, TH * 0.958);
+
+  // Recycle icon
+  g.fillStyle = '#444444';
+  g.font = `${TH * 0.06}px sans-serif`;
+  g.textAlign = 'left';
+  g.fillText('\u267B', TW * 0.06, TH * 0.925);
+
+  // 60g
+  g.textAlign = 'right';
+  g.font = `bold ${TH * 0.042}px 'Arial', sans-serif`;
+  g.fillStyle = '#555555';
+  g.fillText('60g', TW * 0.94, TH * 0.925);
+
+  return new THREE.CanvasTexture(cv);
 }
 
-function showScene(i, anim){
-  document.querySelectorAll('.scene').forEach(s=>{ s.style.opacity=0; });
-  document.getElementById('s'+i).style.opacity=1;
-  setNav(i); setProgress(i); cur=i;
-  if(anim!==false) animIn(i);
-  clearInterval(reelTimer); clearInterval(carTimer);
-  if(i===5) startReel();
-  if(i===6) startCar();
+// ── TOP CAP TEXTURE ────────────────────────────────────────────────────
+function makeCapTex() {
+  const S = 512;
+  const cv = document.createElement('canvas');
+  cv.width = S; cv.height = S;
+  const g = cv.getContext('2d');
+
+  const cg = g.createRadialGradient(S/2, S/2, 0, S/2, S/2, S/2);
+  cg.addColorStop(0,   '#484848');
+  cg.addColorStop(0.5, '#282828');
+  cg.addColorStop(1,   '#161616');
+  g.fillStyle = cg;
+  g.beginPath();
+  g.arc(S/2, S/2, S/2, 0, Math.PI * 2);
+  g.fill();
+
+  // Holes — 2 rings
+  const rings = [
+    { count: 12, r: S * 0.32, hole: S * 0.038 },
+    { count: 6,  r: S * 0.16, hole: S * 0.028 },
+  ];
+  for (const ring of rings) {
+    for (let i = 0; i < ring.count; i++) {
+      const a = (i / ring.count) * Math.PI * 2;
+      const hx = S/2 + Math.cos(a) * ring.r;
+      const hy = S/2 + Math.sin(a) * ring.r;
+      g.beginPath();
+      g.arc(hx, hy, ring.hole, 0, Math.PI * 2);
+      g.fillStyle = '#080808';
+      g.fill();
+    }
+  }
+
+  // Center hole
+  g.beginPath();
+  g.arc(S/2, S/2, S * 0.06, 0, Math.PI * 2);
+  g.fillStyle = '#050505';
+  g.fill();
+
+  // Ridge
+  g.strokeStyle = '#3a3a3a';
+  g.lineWidth = 6;
+  g.beginPath();
+  g.arc(S/2, S/2, S * 0.45, 0, Math.PI * 2);
+  g.stroke();
+
+  return new THREE.CanvasTexture(cv);
 }
 
-function goTo(i, pause){
-  i=((i%TOTAL)+TOTAL)%TOTAL;
-  if(pause){ autoPlay=false; clearTimeout(autoTimer); }
-  showScene(i,true);
-  if(autoPlay) schedAuto();
-}
+// ── BUILD OBJECT ───────────────────────────────────────────────────────
+const group = new THREE.Group();
 
-function schedAuto(){
+// Body
+const bodyGeo = new THREE.CylinderGeometry(1, 0.98, 2.5, 64, 1, true);
+const bodyMat = new THREE.MeshStandardMaterial({
+  map: makeLabelTex(),
+  roughness: 0.22,
+  metalness: 0.08,
+});
+const body = new THREE.Mesh(bodyGeo, bodyMat);
+body.castShadow = true;
+group.add(body);
+
+// Top rim
+const rimGeo = new THREE.CylinderGeometry(1.01, 1.01, 0.15, 64);
+const rimMat = new THREE.MeshStandardMaterial({ color: 0x282828, roughness: 0.28, metalness: 0.25 });
+const rimMesh = new THREE.Mesh(rimGeo, rimMat);
+rimMesh.position.y = 1.32;
+rimMesh.castShadow = true;
+group.add(rimMesh);
+
+// Top cap
+const topGeo = new THREE.CylinderGeometry(1.0, 1.0, 0.04, 64);
+const topMat = new THREE.MeshStandardMaterial({ map: makeCapTex(), roughness: 0.3, metalness: 0.2 });
+const topMesh = new THREE.Mesh(topGeo, topMat);
+topMesh.position.y = 1.38;
+topMesh.castShadow = true;
+group.add(topMesh);
+
+// Bottom cap
+const botGeo = new THREE.CylinderGeometry(0.98, 0.94, 0.08, 64);
+const botMat = new THREE.MeshStandardMaterial({ color: 0x0c0c0c, roughness: 0.5 });
+const botMesh = new THREE.Mesh(botGeo, botMat);
+botMesh.position.y = -1.29;
+group.add(botMesh);
+
+// Ground plane (shadow receiver)
+const planeGeo = new THREE.PlaneGeometry(12, 12);
+const planeMat = new THREE.MeshStandardMaterial({ color: 0x060606, roughness: 0.95, metalness: 0.02 });
+const plane = new THREE.Mesh(planeGeo, planeMat);
+plane.rotation.x = -Math.PI / 2;
+plane.position.y = -1.42;
+plane.receiveShadow = true;
+scene.add(plane);
+
+group.rotation.y = -0.3;
+scene.add(group);
+
+// ── TOUCH / MOUSE CONTROLS ─────────────────────────────────────────────
+let isDragging = false;
+let lastX = 0, lastY = 0;
+let velX  = 0, velY  = 0;
+let curScale = 1;
+let lastPinch = null;
+let autoRotate = true;
+let autoTimer;
+
+function pauseAuto() {
+  autoRotate = false;
   clearTimeout(autoTimer);
-  autoTimer=setTimeout(()=>{ if(autoPlay) goTo(cur+1,false); }, 8000);
+  autoTimer = setTimeout(() => { autoRotate = true; }, 3500);
 }
 
-function animIn(i){
-  const tl=gsap.timeline();
-  if(i===0){
-    tl.from('#i-eye',{opacity:0,y:10,duration:.5})
-      .from('#i-logo',{opacity:0,y:20,duration:.7,ease:'back.out(1.5)'},'-=.2')
-      .from('#i-brand',{opacity:0,y:40,duration:.9,ease:'power3.out'},'-=.2')
-      .from('#i-camp',{opacity:0,y:20,duration:.7},'-=.3')
-      .from('#i-rule',{scaleX:0,duration:.5},'-=.2')
-      .from('#i-sub',{opacity:0,duration:.4},'-=.1');
-  } else if(i===1){
-    tl.from('#p1',{opacity:0,scale:.9,duration:.9,ease:'expo.out'})
-      .from('#p1-logo',{opacity:0,y:-12,duration:.5},'-=.4')
-      .from('#p1-badge',{opacity:0,x:14,duration:.4},'-=.3')
-      .from('#p1-hl',{opacity:0,y:28,duration:.8,ease:'power3.out'},'-=.2')
-      .from('#p1-desc',{opacity:0,y:8,duration:.4},'-=.2')
-      .from('#p1-cta',{opacity:0,scale:.82,duration:.4,ease:'back.out(1.5)'},'-=.2');
-  } else if(i===2){
-    tl.from('#p2',{opacity:0,scale:.9,duration:.9,ease:'expo.out'})
-      .from('#p2-logo',{opacity:0,y:-12,duration:.5},'-=.4')
-      .from('#p2-badge',{opacity:0,x:14,duration:.4},'-=.3')
-      .from('#p2-hl',{opacity:0,y:28,duration:.8,ease:'power3.out'},'-=.2')
-      .from('#p2-desc',{opacity:0,y:8,duration:.4},'-=.2')
-      .from('#p2-cta',{opacity:0,scale:.82,duration:.4,ease:'back.out(1.5)'},'-=.2');
-  } else if(i===3){
-    tl.from('#st1',{opacity:0,scale:.9,duration:.9,ease:'expo.out'})
-      .from('#st1-logo',{opacity:0,y:-12,duration:.5},'-=.4')
-      .from('#st1-hl',{opacity:0,x:-22,duration:.8,ease:'power3.out'},'-=.3')
-      .from('#st1-desc',{opacity:0,y:10,duration:.4},'-=.2')
-      .from('#st1-btn',{opacity:0,scale:.82,duration:.4,ease:'back.out(1.5)'},'-=.2');
-  } else if(i===4){
-    tl.from('#st2',{opacity:0,scale:.9,duration:.9,ease:'expo.out'})
-      .from('#st2-logo',{opacity:0,y:-12,duration:.5},'-=.4')
-      .from('#st2-hl',{opacity:0,x:-22,duration:.8,ease:'power3.out'},'-=.3')
-      .from('#st2-desc',{opacity:0,y:10,duration:.4},'-=.2')
-      .from('#st2-btn',{opacity:0,scale:.82,duration:.4,ease:'back.out(1.5)'},'-=.2');
-  } else {
-    tl.from('#s'+i+' .vt',{opacity:0,scale:.9,duration:.9,ease:'expo.out'});
-  }
-}
-
-// Reel carousel
-const RS=['rA','rB','rC'], RD=['rd0','rd1','rd2'];
-let rIdx=0;
-function setRD(i){ RD.forEach((id,idx)=>document.getElementById(id).className=idx===i?'cdot on':'cdot'); }
-function showR(i){
-  const p=RS[(rIdx-1+3)%3]; rIdx=((i%3)+3)%3;
-  gsap.to('#'+p,{opacity:0,x:-16,duration:.4});
-  gsap.fromTo('#'+RS[rIdx],{opacity:0,x:16},{opacity:1,x:0,duration:.5,ease:'power2.out',delay:.1});
-  setRD(rIdx);
-}
-function startReel(){
-  gsap.set(RS.map(s=>'#'+s),{opacity:0,x:0}); gsap.set('#rA',{opacity:1}); setRD(0); rIdx=0;
-  reelTimer=setInterval(()=>showR(rIdx+1),1800);
-}
-
-// Car carousel
-const CS=['cA','cB','cC'], CD=['cd0','cd1','cd2'];
-let cIdx=0;
-function setCD(i){ CD.forEach((id,idx)=>document.getElementById(id).className=idx===i?'cdot on':'cdot'); }
-function showC(i){
-  const p=CS[(cIdx-1+3)%3]; cIdx=((i%3)+3)%3;
-  gsap.to('#'+p,{opacity:0,x:-16,duration:.4});
-  gsap.fromTo('#'+CS[cIdx],{opacity:0,x:16},{opacity:1,x:0,duration:.5,ease:'power2.out',delay:.1});
-  setCD(cIdx);
-}
-function startCar(){
-  gsap.set(CS.map(s=>'#'+s),{opacity:0,x:0}); gsap.set('#cA',{opacity:1}); setCD(0); cIdx=0;
-  carTimer=setInterval(()=>showC(cIdx+1),2200);
-}
-
-// Touch swipe (móvil)
-let touchX=0, touchY=0;
-const sc=document.getElementById('showcase');
-sc.addEventListener('touchstart',e=>{
-  touchX=e.touches[0].clientX;
-  touchY=e.touches[0].clientY;
-},{passive:true});
-sc.addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-touchX;
-  const dy=e.changedTouches[0].clientY-touchY;
-  if(Math.abs(dx)>Math.abs(dy) && Math.abs(dx)>38){
-    dx<0 ? goTo(cur+1,true) : goTo(cur-1,true);
-  }
-},{passive:true});
-
-// Controls
-document.getElementById('btn-prev').addEventListener('click',()=>goTo(cur-1,true));
-document.getElementById('btn-next').addEventListener('click',()=>goTo(cur+1,true));
-document.querySelectorAll('.nav-item').forEach(el=>{
-  el.addEventListener('click',()=>goTo(parseInt(el.dataset.i),true));
+// Mouse
+canvas.addEventListener('mousedown', e => {
+  isDragging = true; velX = velY = 0;
+  lastX = e.clientX; lastY = e.clientY;
+  pauseAuto();
 });
-document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowRight') goTo(cur+1,true);
-  if(e.key==='ArrowLeft')  goTo(cur-1,true);
-  if(e.key===' '){ autoPlay=!autoPlay; if(autoPlay) schedAuto(); }
+window.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  velX = (e.clientX - lastX) * 0.009;
+  velY = (e.clientY - lastY) * 0.006;
+  group.rotation.y += velX;
+  group.rotation.x  = Math.max(-0.65, Math.min(0.65, group.rotation.x + velY));
+  lastX = e.clientX; lastY = e.clientY;
+});
+window.addEventListener('mouseup', () => { isDragging = false; });
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  curScale = Math.max(0.45, Math.min(2.4, curScale - e.deltaY * 0.0009));
+  group.scale.setScalar(curScale);
+  pauseAuto();
+}, { passive: false });
+
+// Touch
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (e.touches.length === 1) {
+    isDragging = true; velX = velY = 0;
+    lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+    pauseAuto();
+  } else if (e.touches.length === 2) {
+    isDragging = false;
+    lastPinch = pinchDist(e);
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (e.touches.length === 1 && isDragging) {
+    velX = (e.touches[0].clientX - lastX) * 0.011;
+    velY = (e.touches[0].clientY - lastY) * 0.007;
+    group.rotation.y += velX;
+    group.rotation.x  = Math.max(-0.65, Math.min(0.65, group.rotation.x + velY));
+    lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+  } else if (e.touches.length === 2 && lastPinch !== null) {
+    const d = pinchDist(e);
+    curScale = Math.max(0.45, Math.min(2.4, curScale * (d / lastPinch)));
+    group.scale.setScalar(curScale);
+    lastPinch = d;
+    pauseAuto();
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  if (e.touches.length < 2) lastPinch = null;
+  if (e.touches.length === 0) isDragging = false;
 });
 
-showScene(0,true);
-schedAuto();
+function pinchDist(e) {
+  const dx = e.touches[0].clientX - e.touches[1].clientX;
+  const dy = e.touches[0].clientY - e.touches[1].clientY;
+  return Math.hypot(dx, dy);
+}
 
-// Pausar autoplay al scrollear hacia el brief
-window.addEventListener('scroll',()=>{
-  const inShowcase = window.scrollY < window.innerHeight * 0.6;
-  if(!inShowcase && autoPlay){
-    autoPlay=false;
-    clearTimeout(autoTimer);
-  } else if(inShowcase && !autoPlay){
-    autoPlay=true;
-    schedAuto();
+// ── HINT FADE ───────────────────────────────────────────────────────────
+setTimeout(() => document.getElementById('hint').classList.add('hidden'), 4000);
+
+// ── RESIZE ─────────────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  camera.aspect = W() / H();
+  camera.updateProjectionMatrix();
+  renderer.setSize(W(), H());
+});
+
+// ── ANIMATION LOOP ──────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const elapsed = clock.getElapsedTime();
+
+  if (autoRotate) {
+    group.rotation.y += 0.0045;
+    velX = 0; velY = 0;
+  } else if (!isDragging) {
+    velX *= 0.90;
+    velY *= 0.90;
+    group.rotation.y += velX;
+    group.rotation.x = Math.max(-0.65, Math.min(0.65, group.rotation.x + velY));
   }
-},{ passive:true });
+
+  // Float
+  group.position.y = Math.sin(elapsed * 0.55) * 0.05;
+
+  // Red glow pulse
+  redGlow.intensity = 1.0 + Math.sin(elapsed * 1.4) * 0.3;
+
+  renderer.render(scene, camera);
+}
+animate();
 </script>
+
 </body>
 </html>
